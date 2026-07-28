@@ -1,0 +1,27 @@
+GAN-train accuracy: 0.5833
+Baseline accuracy: 0.3333
+
+GAN_train  classification report
+--------------------------------
+              precision    recall  f1-score   support
+
+        ASMI       1.00      0.50      0.67         4
+         IMI       1.00      0.25      0.40         4
+        NORM       0.44      1.00      0.62         4
+
+    accuracy                           0.58        12
+   macro avg       0.81      0.58      0.56        12
+weighted avg       0.81      0.58      0.56        12
+
+
+Baseline classification report
+--------------------------------
+              precision    recall  f1-score   support
+
+        ASMI       0.40      0.50      0.44         4
+         IMI       0.00      0.00      0.00         4
+        NORM       0.40      0.50      0.44         4
+
+    accuracy                           0.33        12
+   macro avg       0.27      0.33      0.30        12
+weighted avg       0.27      0.33      0.30        12

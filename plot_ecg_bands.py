@@ -9,9 +9,6 @@ from matplotlib.ticker import AutoMinorLocator
 
 
 
-
-
-
 def get_lb_ub(ecg_samples, percentile = 95, perc_method = 'closest_observation'):
     
     #shape of ecg_xx_samples(batch_size, n_samples, 12)
