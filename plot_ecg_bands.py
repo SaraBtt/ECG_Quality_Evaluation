@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from math import ceil 
-
+import re
 
 
 import matplotlib.pyplot as plt
@@ -143,14 +143,19 @@ def plot_ecg_bands(ecg_real_sample, ecg_gen_sample, ecg_real_diagnosis= 'Real', 
     
         
     if save_folder_path is not None: 
-        if bands:
-            figtitle = os.path.join(save_folder_path, f'real_{ecg_real_diagnosis}_VS_synthFrom_{ecg_gen_diagnosis}_ecg_BANDS_{len(ecg_gen_sample)}elem.pdf')
+        if save_folder_path.endswith('.pdf'): #If I give the full path with the filename, I will use it as is
+            additional_part = f"_{ecg_real_diagnosis}_VS_{ecg_gen_diagnosis}.pdf"
+            figtitle=re.sub(r'.pdf', additional_part, save_folder_path)
+            
         else:
-            figtitle = os.path.join(save_folder_path, f'real_{ecg_real_diagnosis}_VS_synthFrom_{ecg_gen_diagnosis}_ecg_SAMPLES_{len(ecg_gen_sample)}elem.pdf')
+            if bands:
+                figtitle = os.path.join(save_folder_path, f'real_{ecg_real_diagnosis}_VS_synthFrom_{ecg_gen_diagnosis}_ecg_BANDS_{len(ecg_gen_sample)}elem.pdf')
+            else:
+                figtitle = os.path.join(save_folder_path, f'real_{ecg_real_diagnosis}_VS_synthFrom_{ecg_gen_diagnosis}_ecg_SAMPLES_{len(ecg_gen_sample)}elem.pdf')
 
         plt.rc('pdf', fonttype = 42)
         plt.rc('ps', fonttype = 42)
-        plt.savefig(figtitle, transparent=False, bbox_inches='tight', pad_inches=0)
+        plt.savefig(figtitle, transparent=False, bbox_inches='tight', pad_inches=0, rasterized=True)
         plt.close(fig)
     
     else:
