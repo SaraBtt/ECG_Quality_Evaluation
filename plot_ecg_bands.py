@@ -84,22 +84,22 @@ def plot_ecg_bands(ecg_real_sample, ecg_gen_sample, ecg_real_diagnosis= 'Real', 
             
             if bands:
                 #Real, band and plot
-                ax.fill_between(time_samples, real_lb[:, ind], real_ub[:, ind], 
+                ax.fill_between(time_samples, real_lb[:, ind], real_ub[:, ind], rasterized=True,
                                 label=f'Real ECG {ecg_real_diagnosis}, {len(ecg_real_sample)} samples', color ='b', alpha = 0.7) 
                 if show_avg_ecg:
-                    ax.plot(time_samples, real_avg[:,ind], label=f'Real ECG {ecg_real_diagnosis}, average', color='b')
+                    ax.plot(time_samples, real_avg[:,ind], label=f'Real ECG {ecg_real_diagnosis}, average', color='b', rasterized=True)
 
                 #gen band and plot
-                ax.fill_between(time_samples, synth_lb[:, ind], synth_ub[:, ind], 
+                ax.fill_between(time_samples, synth_lb[:, ind], synth_ub[:, ind], rasterized=True,
                                 label=f'SYNTH ECG from {ecg_gen_diagnosis}, {len(ecg_gen_sample)} samples', color ='r', alpha = 0.7) #color ='m'
                 if show_avg_ecg:
-                    ax.plot(time_samples, synth_avg[:,ind], linewidth=2, label=f'SYNTH from {ecg_gen_diagnosis} ECG', color='r')
+                    ax.plot(time_samples, synth_avg[:,ind], linewidth=2, label=f'SYNTH from {ecg_gen_diagnosis} ECG', color='r', rasterized=True)
             
-            else: #Plot MANY ECGS TOGHETHER
+            else: #Plot MANY ECGS TOGHETER
                 for ir in range(len(ecg_real_sample)):
-                    ax.plot(time_samples, ecg_real_sample[ir, :, ind], label=f'Real ECG {ecg_real_diagnosis}', color ='b') #color ='b'
+                    ax.plot(time_samples, ecg_real_sample[ir, :, ind], label=f'Real ECG {ecg_real_diagnosis}', color ='b', rasterized=True) #color ='b'
                 for ig in range(len(ecg_gen_sample)):
-                    ax.plot(time_samples, ecg_gen_sample[ig, :, ind], label=f'SYNTH ECG from {ecg_gen_diagnosis}', color ='r') #color ='m'
+                    ax.plot(time_samples, ecg_gen_sample[ig, :, ind], label=f'SYNTH ECG from {ecg_gen_diagnosis}', color ='r', rasterized=True) #color ='m'
 
             if show_st:
                 start_sec = time_samples[st_start]
@@ -155,7 +155,7 @@ def plot_ecg_bands(ecg_real_sample, ecg_gen_sample, ecg_real_diagnosis= 'Real', 
 
         plt.rc('pdf', fonttype = 42)
         plt.rc('ps', fonttype = 42)
-        plt.savefig(figtitle, transparent=False, bbox_inches='tight', pad_inches=0, rasterized=True)
+        plt.savefig(figtitle, transparent=False, bbox_inches=None, pad_inches=0)
         plt.close(fig)
     
     else:
