@@ -2,7 +2,10 @@ import numpy as np
 import scipy
 import math
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+mpl.rcParams["text.usetex"] = False
 
 from radar_chart import *
 
@@ -24,7 +27,7 @@ def compute_avg_percent(real_avg, fake_avg, signif = 0.05):
 
     dof = len(real_mu)
 
-    chi2_dof_sig = scipy.stats.chi2.ppf(signif, dof)
+    chi2_dof_sig = scipy.stats.chi2.ppf(1-signif, dof)
 
     cov_sum = np.array([real_cov[i,i]*(1/n_real)+fake_cov[i,i]*(1/n_fake) for i in range(real_cov.shape[0])])
 
@@ -65,7 +68,7 @@ def plot_st_radar(real_data, fake_data, st_start, st_end,
 
     diff_avg, conf_int_lb, conf_int_ub = compute_avg_percent(real_st_avg, fake_st_avg, significance)
     
-    plt.rcParams['text.usetex'] = True
+    # plt.rcParams['text.usetex'] = True
 
     N = 12
     theta = radar_factory(N, frame='polygon')
@@ -103,7 +106,7 @@ def plot_st_radar(real_data, fake_data, st_start, st_end,
                      horizontalalignment='center', verticalalignment='center')
 
     # add legend relative to top-left plot
-    labels = ('Upper bound, 95%', 'Average', 'Lowerbound, 5%')
+    labels = ('Lowerbound', 'Average', 'Upper bound')
     legend = ax.legend(labels, loc=(0.9, .95),
                                 labelspacing=0.1, fontsize='small')
 
