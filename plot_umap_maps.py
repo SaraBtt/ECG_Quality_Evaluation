@@ -10,7 +10,7 @@ import matplotlib.gridspec as gridspec
 from scipy.stats.kde import gaussian_kde
 import tqdm
 
-from utils import ECGDataPair, ECGSample
+from make_data import ECGDataPair, ECGSample
 
 
 def plot_UMAP_mesh(real_data, gen_data, real_class, gen_from_class, ax2, fig, title_on = True, save_single = None):

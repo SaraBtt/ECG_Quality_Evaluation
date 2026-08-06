@@ -12,6 +12,7 @@ from radar_chart import *
 import os
 
 
+
 def compute_avg_percent(real_avg, fake_avg, signif = 0.05):
 
     real_mu = np.average(real_avg, axis=0)
@@ -79,11 +80,13 @@ def plot_st_radar(real_data, fake_data, st_start, st_end,
     if ax==None:
         fig, ax = plt.subplots(figsize=fig_size, nrows=1, ncols=1,
                                     subplot_kw=dict(projection='radar'))
-        
-        if show_title:
-            if title == None:
-                title = r'Confidence bounds $ (\overline{x}^{R}_{lead} - \overline{y}^{S}_{lead}) \pm \sqrt{ \chi^2_{12, \alpha} (S^{R}_{lead}/|X_{R}| + S^{S}_{lead}/|Y_{S}|)} $, where $ \overline{x}^{R}_{lead}$ is ' + real_label + r', and $ \overline{y}^{S}_{lead} $ '+ fake_label
-        fig.text(0.5, 0.965, title, horizontalalignment='center', color='black', weight='bold', size='large')
+    else:
+        fig = ax.figure    
+    
+    if show_title:
+        if title == None:
+            title = r'Confidence bounds $ (\overline{x}^{R}_{lead} - \overline{y}^{S}_{lead}) \pm \sqrt{ \chi^2_{12, \alpha} (S^{R}_{lead}/|X_{R}| + S^{S}_{lead}/|Y_{S}|)} $, where $ \overline{x}^{R}_{lead}$ is ' + real_label + r', and $ \overline{y}^{S}_{lead} $ '+ fake_label
+    fig.text(0.5, 0.965, title, horizontalalignment='center', color='black', weight='bold', size='large')
     #fig.subplots_adjust(wspace=0.25, hspace=0.20, top=0.85, bottom=0.05)
 
     colors = ['b', 'r', 'b']
@@ -95,7 +98,9 @@ def plot_st_radar(real_data, fake_data, st_start, st_end,
         ax.plot(theta, data[0][1][ind, :], color=color)  
     ax.set_varlabels(spoke_labels)
 
-    ax.plot(theta, [0]*12, color='k', linestyle='--')
+    #Mi line here
+    ax.plot(theta, [0.1,0.1,0.1,0.1,0.1,0.1, 0.1, 0.15,0.15, 0.1,0.1,0.1] , color="#420303", linewidth=3, linestyle = '--', label='MI Threshold')
+    ax.plot(theta, [0]*12, color='k', linestyle='--') #Zero line
 
 
     data_fb_0 = data[0][1][0, :]
@@ -106,25 +111,25 @@ def plot_st_radar(real_data, fake_data, st_start, st_end,
                      horizontalalignment='center', verticalalignment='center')
 
     # add legend relative to top-left plot
-    labels = ('Lowerbound', 'Average', 'Upper bound')
-    legend = ax.legend(labels, loc=(0.9, .95),
-                                labelspacing=0.1, fontsize='small')
+    # labels = ('Lowerbound', 'Average', 'Upper bound')
+    # legend = ax.legend(labels, loc=(0.9, .95),
+    #                             labelspacing=0.1, fontsize='small')
 
     if save_folder != None:
         save_name = os.path.join(save_folder, f'ST_RadarPlot_{real_label}_{fake_label}.pdf')
         print(f'Saved plot at {save_name}')
+        fig.savefig(save_name, bbox_inches="tight")
     
     if show_plot:
         plt.show()
     
     return ax
 
-
 def plot_multiple_st_radar(datasets, st_start =35, st_end=50,
                         significance=0.05, fig_size=(20,20), 
                         show_title=True, show_plot=False,
                         save_folder=None, save_singles=False, show_title_single = False):
-    
+     
     #Compute ideal number of grid rows and columns for subplots
     n_plots = len(datasets)
     if n_plots == 1:
@@ -164,16 +169,19 @@ def plot_multiple_st_radar(datasets, st_start =35, st_end=50,
         if fake_data.shape[-1] != 12:
             fake_data = np.transpose(fake_data, (0, 2, 1))
 
-        if save_singles:
-            save_single_folder = save_folder
-            show_title_single = True
-        else:
-            save_single_folder = None
         
         ax = plot_st_radar( real_data=real_data, fake_data=fake_data, st_start=st_start, st_end=st_end, 
                            real_label=pair.real.label, fake_label=pair.fake.label, significance=significance,
-                            title=None, show_title=show_title_single, show_plot=False, ax=ax, save_folder=save_single_folder)
+                            title=None, show_title=False, show_plot=False, ax=ax, save_folder=None)
         
+        if save_singles and save_folder is not None:
+            single_ax = plot_st_radar( real_data=real_data, fake_data=fake_data, 
+                                      st_start=st_start, st_end=st_end, 
+                                      real_label=pair.real.label, fake_label=pair.fake.label, 
+                                      significance=significance, title=None, show_title=True, 
+                                      show_plot=False, ax=None, save_folder=save_folder )
+
+            plt.close(single_ax.figure)
         
         ax.set_title( f'{pair.real.label} and {pair.fake.label}', weight='bold', size='medium', 
                      position=(0.5, 1.1), horizontalalignment='center', verticalalignment='center' )

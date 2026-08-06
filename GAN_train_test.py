@@ -380,7 +380,7 @@ def compute_gan_train_test_scores(gan_train_model, gan_test_model, ecg_dataset, 
         
     ## GAN TRAIN SCORE
     gan_train_preds = predict_aux_classifier(gan_train_model, test_real_loader, device=device, multilabel=multilabel)
-    gan_train_baseline_preds = predict_aux_classifier(gan_test_model, test_fake_loader, device=device, multilabel=multilabel)
+    gan_train_baseline_preds = predict_aux_classifier(gan_train_model, test_fake_loader, device=device, multilabel=multilabel)
     
     gan_train_score, baseline_train_score =  compute_scores_and_save(y_real_test, gan_train_preds, 
                                                                      y_fake_test, gan_train_baseline_preds, 
