@@ -259,7 +259,7 @@ def compute_scores_and_save(gan_labels, gan_preds, baseline_labels, baseline_pre
     baseline_report = classification_report( baseline_labels, baseline_preds, **report_kwargs )
 
     output = (
-        f"GAN-train accuracy: {gan_accuracy:.4f}\n"
+        f"{name} accuracy: {gan_accuracy:.4f}\n"
         f"Baseline accuracy: {baseline_accuracy:.4f}\n\n"
         f"--------------------------------\n"
         f"{name} classification report\n"

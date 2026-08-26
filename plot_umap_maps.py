@@ -18,7 +18,7 @@ def plot_UMAP_mesh(real_data, gen_data, real_class, gen_from_class, ax2, fig, ti
     Plot UMAP 2d mesh of real data and scatter of synthetic data.
     '''
     
-    spec = gridspec.GridSpec(ncols=1, nrows=1, figure=fig)
+    # spec = gridspec.GridSpec(ncols=1, nrows=1, figure=fig)
 
     x = real_data[:, 0]
     y = real_data[:, 1]
@@ -38,15 +38,29 @@ def plot_UMAP_mesh(real_data, gen_data, real_class, gen_from_class, ax2, fig, ti
     ax2.scatter(gen_data[:,0], gen_data[:,1], c='m', alpha=0.5, linewidth=0.1, marker='*', label='Synthetic')
     
     if title_on:
-        ax2.set_title(f'Real {real_class} heatmap, synth (from {gen_from_class} ECG) in scatter ',
-                    fontsize=15,
+        ax2.set_title(f'Real {real_class} heatmap, \n Synth {gen_from_class} scatter ',
+                    fontsize=12,
                     pad=10)
         # fig.colorbar(im, ax=ax2)
         # ax2.legend()
         
     if save_single is not None:
         save_name = os.path.join(save_single, f'umap_{real_class}_from_{gen_from_class}.pdf')
-        fig.savefig( save_name, dpi=300, bbox_inches='tight' )
+        # fig.savefig( save_name, dpi=300, bbox_inches='tight' )
+        
+         # Create an independent single-panel figure
+        fig_single, ax_single = plt.subplots(figsize=(6, 5))
+        ax_single.pcolormesh( xi, yi, zi.reshape(xi.shape), alpha=1 )
+        ax_single.scatter( gen_data[:, 0], gen_data[:, 1], c='m', alpha=0.5, linewidth=0.1, marker='*', label='Synthetic' )
+
+        if title_on:
+            ax_single.set_title( f'Real {real_class} heatmap, \n Synth {gen_from_class} scatter', fontsize=12, pad=10 )
+
+        fig_single.tight_layout()
+        fig_single.savefig( save_name, dpi=300,bbox_inches='tight' )
+
+    plt.close(fig_single)
+
 
     return ax2, fig
 
@@ -68,15 +82,17 @@ def plot_UMAP_datasets(umap_ecg_datapairs, title_on = True, save_path = None, sa
         n_cols = 1
     
     else:
-        #Compute Grid Shape
-        possible_grids = []
-        for n_cols in range(1, min(5, n_plots) + 1):
-            n_rows = int(np.ceil(n_plots / n_cols))
-            empty_axes = n_rows * n_cols - n_plots
-            grid_difference = abs(n_rows - n_cols)
+        # #Compute Grid Shape
+        # possible_grids = []
+        # for n_cols in range(1, min(2, n_plots) + 1):
+        #     n_rows = int(np.ceil(n_plots / n_cols))
+        #     empty_axes = n_rows * n_cols - n_plots
+        #     grid_difference = abs(n_rows - n_cols)
             
-            possible_grids.append( (empty_axes, grid_difference, n_rows, n_cols) )
-        _, _, n_rows, n_cols = min(possible_grids)
+        #     possible_grids.append( (empty_axes, grid_difference, n_rows, n_cols) )
+        # _, _, n_rows, n_cols = min(possible_grids)
+        n_cols = min(3, n_plots)
+        n_rows = int(np.ceil(n_plots / n_cols))
         
         
     fig, axes = plt.subplots( nrows=n_rows, ncols=n_cols, figsize=(6 * n_cols, 5 * n_rows), squeeze=False )   

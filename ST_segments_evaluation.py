@@ -1,6 +1,7 @@
 import numpy as np
 import scipy
 import math
+import pandas as pd
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -35,8 +36,28 @@ def compute_avg_percent(real_avg, fake_avg, signif = 0.05):
     conf_int_lb = mu_diff - np.sqrt(chi2_dof_sig*cov_sum)
     conf_int_ub = mu_diff + np.sqrt(chi2_dof_sig*cov_sum)
     
-    return mu_diff, conf_int_lb, conf_int_ub
+    return mu_diff, conf_int_lb, conf_int_ub, real_mu, fake_mu, real_cov, fake_cov, cov_sum
 
+
+def save_table_ci(mu_diff, conf_int_lb, conf_int_ub, real_mu, fake_mu, real_cov, fake_cov, save_name_path):
+ 
+    leads = ['I', 'II', 'III', 'AVR', 'AVL', 'AVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
+
+    df = pd.DataFrame({
+        'conf_int_LB': np.squeeze(conf_int_lb),
+        'mu_diff': np.squeeze(mu_diff),
+        'conf_int_UP': np.squeeze(conf_int_ub),
+        'real_mu': np.squeeze(real_mu),
+        'fake_mu': np.squeeze(fake_mu),
+        'real_cov_diag': np.diag(np.atleast_2d(real_cov)),
+        'fake_cov_diag': np.diag(np.atleast_2d(fake_cov)),
+    }, index=leads)
+
+    df.index.name = 'lead'
+
+    df.to_csv(save_name_path, index=True, float_format='%.4f')
+
+    return
 
 def make_data_ecg(diff_avg, ci_lb, ci_ub):
     data_diff = np.array([ci_lb, diff_avg, ci_ub])
@@ -47,7 +68,7 @@ def make_data_ecg(diff_avg, ci_lb, ci_ub):
 
 def plot_st_radar(real_data, fake_data, st_start, st_end, 
                   real_label="Real", fake_label="Fake", significance=0.05, fig_size = (7,7),
-                  title = None, show_title = True, show_plot = False, ax = None, save_folder = None):
+                  title = None, show_title = True, show_plot = False, ax = None, save_folder = None, save_intervals = False):
     
     """
     Plot one ST-segment radar comparison.
@@ -67,7 +88,13 @@ def plot_st_radar(real_data, fake_data, st_start, st_end,
     real_st_avg = np.mean( real_data[:, st_start:st_end, :], axis=1, )
     fake_st_avg = np.mean( fake_data[:, st_start:st_end, :], axis=1, )
 
-    diff_avg, conf_int_lb, conf_int_ub = compute_avg_percent(real_st_avg, fake_st_avg, significance)
+    diff_avg, conf_int_lb, conf_int_ub, real_mu, fake_mu, real_cov, fake_cov, cov_sum = compute_avg_percent(real_st_avg, fake_st_avg, significance)
+    
+    
+    if save_intervals and save_folder is not None:
+        save_intervals_name = os.path.join(save_folder, f'ST_Intervals_{real_label}_{fake_label}.csv')
+        save_table_ci(diff_avg, conf_int_lb, conf_int_ub, real_mu, fake_mu, real_cov, fake_cov, save_intervals_name)
+          
     
     # plt.rcParams['text.usetex'] = True
 
@@ -128,7 +155,8 @@ def plot_st_radar(real_data, fake_data, st_start, st_end,
 def plot_multiple_st_radar(datasets, st_start =35, st_end=50,
                         significance=0.05, fig_size=(20,20), 
                         show_title=True, show_plot=False,
-                        save_folder=None, save_singles=False, show_title_single = False):
+                        save_folder=None, save_singles=False, show_title_single = False,
+                        save_intervals = False):
      
     #Compute ideal number of grid rows and columns for subplots
     n_plots = len(datasets)
@@ -137,15 +165,17 @@ def plot_multiple_st_radar(datasets, st_start =35, st_end=50,
         n_cols = 1
     
     else:
-        #Compute Grid Shape
-        possible_grids = []
-        for n_cols in range(1, min(5, n_plots) + 1):
-            n_rows = int(np.ceil(n_plots / n_cols))
-            empty_axes = n_rows * n_cols - n_plots
-            grid_difference = abs(n_rows - n_cols)
+        # #Compute Grid Shape
+        # possible_grids = []
+        # for n_cols in range(1, min(5, n_plots) + 1):
+        #     n_rows = int(np.ceil(n_plots / n_cols))
+        #     empty_axes = n_rows * n_cols - n_plots
+        #     grid_difference = abs(n_rows - n_cols)
             
-            possible_grids.append( (empty_axes, grid_difference, n_rows, n_cols) )
-        _, _, n_rows, n_cols = min(possible_grids)
+        #     possible_grids.append( (empty_axes, grid_difference, n_rows, n_cols) )
+        # _, _, n_rows, n_cols = min(possible_grids)
+        n_cols = min(3, n_plots)
+        n_rows = int(np.ceil(n_plots / n_cols))
     
     radar_factory(12, frame='polygon')
     fig, axs = plt.subplots( figsize=fig_size, nrows=n_rows, ncols=n_cols, subplot_kw=dict(projection='radar') )
@@ -179,7 +209,7 @@ def plot_multiple_st_radar(datasets, st_start =35, st_end=50,
                                       st_start=st_start, st_end=st_end, 
                                       real_label=pair.real.label, fake_label=pair.fake.label, 
                                       significance=significance, title=None, show_title=True, 
-                                      show_plot=False, ax=None, save_folder=save_folder )
+                                      show_plot=False, ax=None, save_folder=save_folder, save_intervals=save_intervals)
 
             plt.close(single_ax.figure)
         
