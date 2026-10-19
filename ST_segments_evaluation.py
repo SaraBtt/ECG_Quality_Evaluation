@@ -178,6 +178,10 @@ def plot_multiple_st_radar(datasets, st_start =35, st_end=50,
         n_rows = int(np.ceil(n_plots / n_cols))
     
     radar_factory(12, frame='polygon')
+    
+    if n_rows > 3:
+        fig_size = (fig_size[0], int(fig_size[1] * n_rows / 3))
+    
     fig, axs = plt.subplots( figsize=fig_size, nrows=n_rows, ncols=n_cols, subplot_kw=dict(projection='radar') )
     axs = np.asarray(axs).reshape(n_rows, n_cols)
 

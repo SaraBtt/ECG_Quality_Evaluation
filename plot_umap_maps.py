@@ -59,7 +59,7 @@ def plot_UMAP_mesh(real_data, gen_data, real_class, gen_from_class, ax2, fig, ti
         fig_single.tight_layout()
         fig_single.savefig( save_name, dpi=300,bbox_inches='tight' )
 
-    plt.close(fig_single)
+        plt.close(fig_single)
 
 
     return ax2, fig
